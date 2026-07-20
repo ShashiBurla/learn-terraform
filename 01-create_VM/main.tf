@@ -47,39 +47,11 @@ resource "azurerm_public_ip" "example" {
   allocation_method   = "Static"
 }
 
-# Create a Network Security Group with Ports 22 & 80 Allowed
-resource "azurerm_network_security_group" "nsg" {
-  name                = "test-nsg"
-  location            = "Denmark East"
+
+resource "azurerm_dns_a_record" "frontend" {
+  name                = "frontend"
+  zone_name           = "shashidevops.online"
   resource_group_name = "devops-practiece"
-
-  security_rule {
-    name                       = "AllowSSH"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "AllowHTTP"
-    priority                   = 1002
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-}
-
-# Associate the NSG with the Network Interface
-resource "azurerm_network_interface_security_group_association" "nsg_assoc" {
-  network_interface_id      = azurerm_network_interface.main.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
+  ttl                 = 30
+  records             = [azurerm_public_ip.example.ip_address]
 }
