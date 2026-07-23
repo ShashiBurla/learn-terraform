@@ -1,5 +1,5 @@
 variable "resource_group" {
-  default = "devops-practiece" 
+  default = "devops-practiece"
 }
 variable "location" {
   default = "Denmark East"
@@ -10,7 +10,7 @@ variable "image_id" {
 
 variable "components" {
   default = {
-    lb_test1     = "Standard_B1s"
-    lb_test2        = "Standard_B1s"
-}
+    lb-test1 = "Standard_B1s"
+    lb-test2 = "Standard_B1s"
+  }
 }

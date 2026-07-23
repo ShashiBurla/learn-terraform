@@ -1,5 +1,5 @@
 resource "azurerm_network_interface" "main" {
-  for_each = var.components
+  for_each            = var.components
   name                = "${each.key}-nic"
   location            = var.location
   resource_group_name = var.resource_group
@@ -12,34 +12,28 @@ resource "azurerm_network_interface" "main" {
 }
 
 resource "azurerm_linux_virtual_machine" "main" {
-  for_each = var.components
-  name                  = "${each.key}-vm"
-  location              = var.location
-  resource_group_name   = var.resource_group
-  network_interface_ids = [azurerm_network_interface.main[each.key].id]
-  size                  = "${each.value}"
-
-  source_image_id = var.image_id
+  for_each                        = var.components
+  name                            = "${each.key}-vm"
+  location                        = var.location
+  resource_group_name             = var.resource_group
+  network_interface_ids           = [azurerm_network_interface.main[each.key].id]
+  size                            = each.value
+  admin_password                  = "Shashi@80999"
+  admin_username                  = "burlash"
+  disable_password_authentication = false
+  secure_boot_enabled             = true
+  vtpm_enabled                    = true
+  source_image_id                 = var.image_id
+  
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
-
-  admin_password = "Shashi@80999"
-  admin_username = "burlash"
-
-  disable_password_authentication = false
-
-  secure_boot_enabled = true
-  vtpm_enabled        = true
-
 }
 
-resource "azurerm_dns_a_record" "frontend" {
-  for_each = var.components
-  name                = each.key
-  zone_name           = "shashidevops.online"
+resource "azurerm_public_ip" "example" {
+  name                = "LB-pip"
   resource_group_name = var.resource_group
-  ttl                 = 30
-  records             = [azurerm_network_interface.main[each.key].private_ip_address]
+  location            = var.location
+  allocation_method   = "Static"
 }
