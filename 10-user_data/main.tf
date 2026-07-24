@@ -1,4 +1,5 @@
 resource "azurerm_network_interface" "main" {
+  for_each = var.components
   name                = "${each.key}-nic"
   location            = var.location
   resource_group_name = var.resource_group
@@ -17,8 +18,8 @@ resource "azurerm_linux_virtual_machine" "main" {
   name                  = "${each.key}-vm"
   location              = var.location
   resource_group_name   = var.resource_group
-  network_interface_ids = [azurerm_network_interface.main.id]
-  size                  = "Standard_B1s"
+  network_interface_ids = [azurerm_network_interface.main[each.key].id]
+  size                  = each.value
 
   source_image_id = var.image_id
   admin_password = "Shashi@80999"
@@ -34,8 +35,11 @@ resource "azurerm_linux_virtual_machine" "main" {
   }
 
  
-    user_data = filebase64("${path.module}/scripts/init.sh")
-
+    # user_data = filebase64("${path.root}/nginx.sh", )
+  user_data = base64encode(templatefile("${path.root}/nginx.sh", {
+    component_name = each.key
+    env            = var.env
+  }))
 
 }
   
